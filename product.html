@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>商品頁面</title>
+
+  <!-- 風格設定 -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+
+    .product-container {
+      /* display: flex; */
+      display: block;
+      gap: 20px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      align-items: flex-start;
+      /* 讓上下對齊 */
+    }
+
+    .product-images {
+      display: flex;
+      overflow-x: auto;
+      padding: 10px 0;
+      border-bottom: 1px solid #ccc;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    .product-images img {
+      max-width: 220px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    /* 排版容器，用以把兩個區塊並排 */
+    .product-info-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      /*讓兩邊對其、兼具自動分配*/
+      gap: 20px;
+    }
+
+    .product-details {
+      flex-grow: 1;
+    }
+
+    .product-details h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .price {
+      font-size: 22px;
+      color: #d10000;
+      margin: 12px 0;
+    }
+
+    .productConditionTitle {
+      font-weight: bold;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .productConditionDescription {
+      color: #555;
+      font-size: 14px;
+      margin-top: 2px;
+    }
+
+    .section-title {
+      font-weight: bold;
+      margin-top: 18px;
+    }
+
+    .meeting-locations {
+      margin-top: 10px;
+      padding-left: 20px;
+    }
+
+    .meeting-locations li {
+      list-style-type: disc;
+      margin-bottom: 5px;
+    }
+
+    /* 議價欄位 */
+    .buyer-actions {
+      padding: 20px;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      background-color: #fff;
+      width: 250px;
+      max-height: 170px;
+      /* 限制最大高度 */
+    }
+
+    .seller-info {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .seller-info:hover {
+      opacity: 0.8;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    .seller-name {
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .buy-button,
+    .bargain-button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .buy-button {
+      background-color: #d10000;
+      color: white;
+    }
+
+    .bargain-button {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+  </style>
+</head>
+
+
+<body>
+  <!-- 商品圖片 -->
+  <div class="product-container">
+    <div class="product-images" id="productImages"></div>
+
+    <!-- 圖片下方資訊列 -->
+    <div class="product-info-row">
+
+      <!-- 商品詳細資訊 -->
+      <div class="product-details">
+        <h1 id="productName">商品名稱</h1>
+        <div class="price" id="productPrice">NT$0</div>
+
+        <!-- 商品狀況 -->
+        <div>
+          <span class="section-title">商品狀況：</span>
+          <div id="productConditionTitle" class="productConditionTitle"></div>
+          <div id="productConditionDescription" class="productConditionDescription"></div>
+        </div>
+
+        <div class="section-title">商品描述：</div>
+        <p id="productDescription">這裡是商品敘述。</p>
+
+        <div class="section-title">面交地點：</div>
+        <ul class="meeting-locations" id="productLocations"></ul>
+        <!-- JavaScript 將插入面交地點 -->
+      </div>
+
+      <!-- 點賣家資訊跳轉到賣家頁面 / 進行購買、議價 -->
+      <div class="buyer-actions">
+        <a href="/user.html?uid=12345" class="seller-info">
+          <img src="seller-avatar.jpg" alt="賣家頭像" class="avatar" id="seller-avatar">
+          <span class="seller-name" id="seller-name">@賣家名稱</span>
+        </a>
+        <button class="buy-button" onclick="confirmPurchase()">直接購買</button>
+        <button class="bargain-button" onclick="goToBargain()">前往議價</button>
+      </div>
+    </div>
+
+    <script>
+      // 商品資料變數（可改為從後端或 API 取得）
+      const productData = {
+        name: "日本 ag WHP01K 藍牙降噪耳罩式耳機",
+        price: 2800,
+        condition: "狀況良好",
+        description: "購於日本 ag 官方，盒裝與配件齊全，使用不到十次。",
+        images: [
+          "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/airpods-4-select-202409_FMT_WHH?wid=1200&hei=630&fmt=jpeg&qlt=95&.v=1723685837066",
+          "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQw6A57jJK5FP1aVOqKIh-j4CWTiIaIMVaGw&s",
+          "https://www.studioa.com.tw/studioa/sagoods/2024/10/20241001135713316.webp",
+          "https://www.studioa.com.tw/studioa/sagoods/2024/10/20241001135713316.webp",
+          "https://www.studioa.com.tw/studioa/sagoods/2024/10/20241001135713316.webp",
+          "https://www.studioa.com.tw/studioa/sagoods/2024/10/20241001135713316.webp"],
+        meetingLocations: ["交大圖書館", "小徑"]
+      };
+
+      // 商品狀況說明對照表（請放在 productData 後）
+      const conditionDescriptions = {
+        "全新": "從未使用過。可能含原包裝或標籤。",
+        "幾乎全新": "使用1-2次，幾乎和新的一樣。",
+        "狀況良好": "使用時都很小心。瑕疵（如果有的話）也幾乎看不出來。",
+        "輕度使用": "有些微穿過的痕跡。可能有些小瑕疵，可見商品敘述。",
+        "狀況尚可": "有明顯穿著過的痕跡。瑕疵請見商品敘述。"
+      };
+
+      // 插入商品資料到頁面
+      document.getElementById("productName").textContent = productData.name;
+      document.getElementById("productPrice").textContent = "NT$" + productData.price;
+      document.getElementById("productConditionTitle").textContent = productData.condition;
+      document.getElementById("productConditionDescription").textContent =
+        conditionDescriptions[productData.condition] || "";
+      document.getElementById("productDescription").textContent = productData.description;
+
+      const imageContainer = document.getElementById("productImages");
+      productData.images.forEach(imgUrl => {
+        const img = document.createElement("img");
+        img.src = imgUrl;
+        img.alt = "商品圖片";
+        imageContainer.appendChild(img);
+      });
+
+      const locationsList = document.getElementById("productLocations");
+      productData.meetingLocations.forEach(location => {
+        const li = document.createElement("li");
+        li.textContent = location;
+        locationsList.appendChild(li);
+      });
+
+      // 右側議價欄位賣家資訊套用
+      const sellerData = {
+        id: 12345,
+        username: "dhjdhhw",
+        avatar: "https://today-obs.line-scdn.net/0ha8ZAsWeiPhdnOBaJwhZBQF1uPXhUVC0UAw5vFCRWYCMeX3ERUlh5eURrYyVKXHlJCQ54d0A7JSYYCn0TDFl5/w644"
+      };
+      document.getElementById("seller-name").textContent = "@" + sellerData.username;
+      document.getElementById("seller-avatar").src = sellerData.avatar;
+      document.querySelector(".seller-info").href = "/user.html?uid=" + sellerData.id;
+
+      // 購買、議價按鈕設定
+      function confirmPurchase() {
+        const confirmResult = confirm("確定購買此商品！");
+        if (confirmResult) {
+          // 跳轉到購物車頁面，實際應用可改為真實路徑
+          window.location.href = "/cart.html";
+        }
+      }
+
+      function goToBargain() {
+        // 跳轉到議價頁面
+        window.location.href = "/chat.html";
+      }
+
+
+    </script>
+
+</body>
+
+</html>
